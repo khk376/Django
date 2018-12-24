@@ -1,0 +1,226 @@
+Django 스타트~!
+<프로젝트 생성 - 모델 구현 - URLconf 정의 - 템플릿 개발 - view개발>
+
+cmd창 오픈
+C:\Users\Playdata>
+
+conda create -n djangoenv python=3.6
+
+activate djangoenv
+
+pip list
+
+pip install Django
+
+
+https://docs.djangoproject.com/ko/2.1/intro/overview/
+
+----------------------
+<mysite/news/views.py>
+----------------------
+from django.shortcuts import render
+
+from .models import Article
+
+def year_archive(request, year): 요청들어옴 리퀘스트변수 받음
+    a_list = Article.objects.filter(pub_date__year=year)    클라이언트에게 이러한 서비스제공할것이다~
+    context = {'year': year, 'article_list': a_list}
+    return render(request, 'news/year_archive.html', context) 응답 html지정해서 html 응답
+	
+	
+----------------------------------------------
+<mysite/news/templates/news/year_archive.html>
+----------------------------------------------
+{% extends "base.html" %}
+
+{% block title %}Articles for {{ year }}{% endblock %}
+
+{% block content %}
+<h1>Articles for {{ year }}</h1>
+
+ 장고는 html에서도 파이썬코드로 반복문 사용 가능
+{% for article in article_list %}  
+    <p>{{ article.headline }}</p> 
+    <p>By {{ article.reporter.full_name }}</p>
+    <p>Published {{ article.pub_date|date:"F j, Y" }}</p>
+{% endfor %}
+{% endblock %}
+
+
+============================================================
+
+
+cmd에서
+activate djangoenv    장고활성화하고
+
+(djangoenv) C:\Users\Playdata>cd C:\0.ITstudy\12.Django\step01 폴더경로잡아줌
+
+part1
+https://docs.djangoproject.com/ko/2.1/intro/tutorial01/
+$ django-admin startproject mysite 복붙
+
+(djangoenv) C:\0.ITstudy\12.Django\step01>django-admin startproject mysite
+
+그리고 비쥬얼스튜디오로 폴더 지정해서 오픈
+
+
+*url 설정파일
+ - 언어, 시간, 프로젝트(앱) 설정 파일
+ - 설정 파일의 DB설정 정보 확인
+ 
+http://127.0.0.1:8000/
+들어가서 f12로 수정가능
+
+- 튜토리얼1에서 설문조사 만들기앱
+python manage.py startapp polls 복붙
+C:\0.ITstudy\12.Django\step01\mysite>python manage.py startapp polls
+
+DB Brower for sqlite 켠뒤
+파일(F) -> db오픈 -> mysite경로에있는 db.sqilte3 db파일열기
+
+비쥬얼에서 urls.py 만들고 polls/urls.py 코드 복붙.
+
+----------------------------------------------
+local:8000/admin/polls
+
+
+-------------------------------------------------
+리뷰
+
+DB관점에서 웹서버의 필요성은?
+
+데이터가 필요하져
+
+데이터를 지속적으로 활용 및 저장해야져!
+그리고 구조화랑 데이터간의 관계도 필요하져
+정형화도 해야겠져
+
+웹서비스를 하고자하면
+고객과 요청응답 주고받을수 있는 웹서버가 필요하겠져?
+
+Server – 웹상에서 로직을 서비스 하는 주체, 응답
+Client – 웹상에서 로직을 서비스 받는 주체, 요청
+Web Server - 웹서비스 로직을 실행 시킬 수 있는 서버 시스템
+ 특징
+• 개별 client의 요청 구분 : IP 및 입력 데이터 구분 
+	– HttpRequest
+• 개별 Client들에게 응답 
+	– HttpResponse
+
+ORM : 미리 만들어놓은 것을 실행시킴. 이름만바꿔서
+	preparedstatement로 자동으로 생성하게 만들어줌
+    
+	조합된 것을 함수를 쓰면 함수에 맞는것을 골라씀
+	
+url매핑 - 클라이언트가 서버로 url 보내면 서버에서 db단에 저장된 정보로 html보여줌
+
+
+-----------------------------------------------------------------------
+< 장고2일차! >
+1.
+C:\Users\Playdata>activate djangoenv
+
+(djangoenv) C:\Users\Playdata>C:\0.ITstudy\12.Django\django1\mysite
+'C:\0.ITstudy\12.Django\django1\mysite'은(는) 내부 또는 외부 명령, 실행할 수 있는 프로그램, 또는
+배치 파일이 아닙니다.
+
+(djangoenv) C:\Users\Playdata>cd C:\0.ITstudy\12.Django\django1\mysite
+
+(djangoenv) C:\0.ITstudy\12.Django\django1\mysite>python manage.py runserver
+Performing system checks...
+
+2.
+http://127.0.0.1:8000/admin/
+
+3.
+question에 질문 추가해보기
+
+4.
+DB browser에서 불러와서 테이블보기
+
+
+=
+
+
+=============================================================================
+http://127.0.0.1:8000/myapp
+		-index.html
+		
+1. 파일 저장 위치
+		-myapp\templates\myapp
+		-1. templates 폴더명 수정 불가
+		
+2. url이 index.html을 인지하는 흐름파악
+
+ http://127.0.0.1:8000/myapp
+		
+mysite/setting.py
+ ...
+INSTALLED_APPS = [
+	...
+    'myapp',   #myapp 생성후 추가한 부분
+]
+
+mysite/urls.py
+
+-myapp이라는 앱 하위 views라는 모듈
+:myapp/views.py
+from myapp import views
+		
+urlpatterns=[
+ path('admin/',admin.site.urls),#http//127.0.0.1:8000/admin
+ 
+ path('admin/',lnclude('myapp.urls'),#http//127.0.0.1:8000/myapp
+]
+
+1. include('myapp.urls')-myapp이라는 앱 하위의 urls.py의미
+- 방대해질 수 있는 웹의 로직의 설정 구성을 분산
+- mysite를 통해서 생성시킨 myapp을 다른 프로젝트에서도 병합해서 사용 가능
+(재사용-모듈화-컴포넌트)
+
+2. 'admin/' or 'myapp/' 처리는 이미 실행중인 서버의 설정 정보와 병합되어 진행
+ - runserver가 구동시 django에 처리한 로직에 한해서 http://ip:port는 기본적으로 인지
+ - server의 ip는 변경 소지가 다수 존재
+		path('admin/', admin.site.urls) - 권장 설정
+		path('http://127.0.0.1/admin', admin.site.urls) - 비추 설정
+		
+3. include('myapp.urls')로 지정된 urls.py
+ 1. myapp생성시 자동으로 생성되지 않는 파일
+ 2. 직접 개발자가 개발하는 파일
+ 3. include 함수의 parameter의 경로 및 파일명과 동일
+		
+4. myapp/urls.py
+ #http://127.0.0.1:8000/myapp/
+  path(",view.index, name='index')
+  1. ":url의 일부, 단 기준은 mysite/urls.py에서 설정값 제외한 부분
+		mysite/urls.py에서 설정되었던 값은
+		path('myapp/', include(
+  2. 
+  
+  
+5. 용어 정리
+ -서버:서비스 주체, 제공, 응답 <--- http --->클라이언트:서비스 받는 주체, 요청들어옴
+ -웹 서버는 client와 통신시에 요청이 발생되면 개별 client별 HttpRequest
+HttpResponse를 자동 생성
+
+6. django의 tag
+  1. 확장자가 html파일에서도 사용가능
+  2. 반복문, 조건문과 같은 제어 기능으로 로직 처리? tag? {% %}
+  3. 데이터를 보유하고 있는 변수의 값을 출력시 사용하는 tag? {{변수명}}
+  4. java의 DAO+DTO(Value Object=java Bean)와 같은 구조의 코드들이 생략
+  - 기능은 동일
+  - DTO의 변수들은 table의 컬럼명
+  - django의 model.py에서 개발한 클래스의 변수(db의 컬렴명)
+		
+
+
+	form 태그는 클라이언트가 입력하는 데이터를 서버에 전송시킬수 있는 태그!
+		submit:서버에 전송
+	
+	
+	
+	get: url 싹 다 전송
+	post: 은닉시켜서 전송
+	'view-source:':url앞단에 붙여서 소스보기
+	
+	
